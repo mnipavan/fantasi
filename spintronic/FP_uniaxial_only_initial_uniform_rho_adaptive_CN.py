@@ -4,6 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 '''
+Plot control
+'''
+outPlotInteractive=0
+
+'''
 Mesh
 '''
 global_normal = Expression(("x[0]", "x[1]", "x[2]"), degree=3)
@@ -122,6 +127,11 @@ print("Done creating solver for lower order problem...")
 #### Initiate and start time stepper
 t=0
 
+if (outPlotInteractive != 0):
+	plt.figure()
+	plot(rho_curr.root_node(), title="Initial Solution")
+	plt.show()
+
 for n in range(num_steps):
 	t_next = t + dt
 	# Perform step using both methods
@@ -183,4 +193,9 @@ for n in range(num_steps):
 		vtkfile << (rho_curr, t)
 		print('Updated probability:')
 		print(assemble(rho_curr*dx))
+		if (outPlotInteractive != 0):
+			plt.figure()
+			plot(rho_curr.root_node(), title="Initial Solution")
+			plt.show()
+
 	progress += 1

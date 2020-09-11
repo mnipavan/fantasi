@@ -59,14 +59,13 @@ a, L = lhs(F_CN), rhs(F_CN)
 
 #### Create VTK file for saving solution
 vtkfile = File('GaussianRelax/solution.pvd')
-bc=[]
 
 print('Initial probability:')
-print(assemble(rho_ss*dx))
+print(assemble(rho_curr*dx))
 
 #### Define the problem and solve
 rho_ss  = Function(V)
-solve(a == L, rho_ss, bc)
+solve(a == L, rho_ss)
 
 #### Save solution to VTK file
 vtkfile << rho_ss

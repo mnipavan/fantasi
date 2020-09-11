@@ -75,7 +75,6 @@ a_alt, L_alt = lhs(F_alt), rhs(F_alt)
 
 #### Create VTK file for saving solution
 vtkfile = File('GaussianTransient/solution.pvd')
-bc=[]
 
 #### Generate internal progess output to screen
 progress = Progress('Time-stepping', num_steps)
@@ -98,6 +97,11 @@ print("Done creating solver for lower order problem...")
 
 #### Initiate and start time stepper
 t=0
+plt.figure()
+plot(rho_curr.root_node(), title="Initial solution")
+plt.xlabel("Position")
+plt.ylabel("PDF")
+plt.show()
 
 for n in range(num_steps):
 	t_next = t + dt
@@ -161,3 +165,9 @@ for n in range(num_steps):
 		print('Updated probability:')
 		print(assemble(rho_curr*dx))
 	progress += 1
+
+plt.figure()
+plot(rho_curr.root_node(), title="Final solution")
+plt.xlabel("Position")
+plt.ylabel("PDF")
+plt.show()
