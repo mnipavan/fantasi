@@ -1,12 +1,14 @@
 from fenics import *
 from mshr import *
 import numpy as np
+from matplotlib import cm
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 '''
 Plot control
 '''
-outPlotInteractive=0
+outPlotInteractive=1
 
 '''
 Mesh
@@ -128,8 +130,14 @@ print("Done creating solver for lower order problem...")
 t=0
 
 if (outPlotInteractive != 0):
-	plt.figure()
-	plot(rho_curr.root_node(), title="Initial Solution")
+	fig = plt.figure()
+	ax = fig.gca(projection='3d')
+	u, v = np.mgrid[0:2*np.pi:50j, 0:np.pi:50j]
+	x = np.cos(u)*np.sin(v)
+	y = np.sin(u)*np.sin(v)
+	z = np.cos(v)
+	rho_var = rho_curr(Point(x,y,z))
+	ax.plot_surface(x,y,z, color='g', edgecolor='none')
 	plt.show()
 
 for n in range(num_steps):
@@ -195,7 +203,7 @@ for n in range(num_steps):
 		print(assemble(rho_curr*dx))
 		if (outPlotInteractive != 0):
 			plt.figure()
-			plot(rho_curr.root_node(), title="Initial Solution")
+			plot(rho_curr)
 			plt.show()
 
 	progress += 1
