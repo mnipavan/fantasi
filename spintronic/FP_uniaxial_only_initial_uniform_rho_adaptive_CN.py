@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 '''
 Plot control
 '''
-outPlotInteractive=1
+outPlotInteractive=0
 
 '''
 Mesh
@@ -24,10 +24,10 @@ print(OutLine)
 '''
 Time stepping and time integration
 '''
-T=10e-9                          # final time
+tscale=1e-9                      # Scale factor to convert simulation time to real-time
 num_steps = 31                   # total number of steps
 #dt = T/float(num_steps)         # time step size
-dt = 1e-18                       # time step size (in s)
+dt = 1e-18 / tscale              # time step size (in simulation time)
 #dt = 1e-9                        # time step size (in ns)
 q_degree = 3
 #dx=dx(metadata={'quadrature_degree': q_degree})
@@ -53,7 +53,7 @@ diameter=40.0e-9                                 # diameter of FL with circular 
 #width=3*length
 magVolume = t_FL * (diameter**2) * (np.pi/4.0)   # in m^3
 #magVolume=(np.pi/4)*length*width*thickness
-G=Constant((gamFac*mu0)/(1+alpha**2))            # Scale factor for LLG equation
+G=Constant((gamFac*tscale*mu0)/(1+alpha**2))            # Scale factor for LLG equation
 
 '''
 Temperature parameters
