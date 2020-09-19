@@ -1,4 +1,4 @@
-from fenics import *
+from dolfin import *
 from mshr import *
 import numpy as np
 from matplotlib import cm
@@ -28,11 +28,14 @@ tscale=1e-9                      # Scale factor to convert simulation time to re
 num_steps = 31                   # total number of steps
 #dt = T/float(num_steps)         # time step size
 dt = 1e-18 / tscale              # time step size (in simulation time)
+dtmax = 1e-2			 # maximum time step
+tfactor = 2.0                    # maximum scale factor to expand dt
+tfinal = 10e-9 / tscale          # end-time of simulation
 #dt = 1e-9                        # time step size (in ns)
 q_degree = 3
 #dx=dx(metadata={'quadrature_degree': q_degree})
 absTol=1e-15
-relTol=1e-5
+relTol=1e-7
 
 '''
 Constant parameters for LLG problem
@@ -104,7 +107,7 @@ a_CN, L_CN  = lhs(F_CN), rhs(F_CN)
 a_alt, L_alt = lhs(F_alt), rhs(F_alt)
 
 #### Create VTK file for saving solution
-vtkfile = File('FP_Fenics_result_files/solution.pvd')
+vtkfile = File('result_files/solution.pvd')
 bc=[]
 
 #### Generate internal progess output to screen
@@ -128,6 +131,7 @@ print("Done creating solver for lower order problem...")
 
 #### Initiate and start time stepper
 t=0
+n=0
 
 if (outPlotInteractive != 0):
 	fig = plt.figure()
@@ -140,8 +144,18 @@ if (outPlotInteractive != 0):
 	ax.plot_surface(x,y,z, color='g', edgecolor='none')
 	plt.show()
 
-for n in range(num_steps):
+while (t < tfinal):
+	n = n+1
+
+	if (dt > dtmax):
+		dt = dtmax
+
 	t_next = t + dt
+
+	if (t_next > tfinal):
+		dt = tfinal - t
+		t_next = tfinal
+
 	# Perform step using both methods
 	solvCN.solve()
 	solvAlt.solve()
@@ -159,11 +173,11 @@ for n in range(num_steps):
 	# Find the maximum ratio and adapt time-step
 	maxErrRatio = max(errRatio)
 	if max(errRatio) == 0.0:
-		dt = 0.8*4.0*dt
+		dt = 0.8*tfactor*dt
 	else:
 		factor = 1.0/sqrt(maxErrRatio)
-		if factor > 4.0:
-			factor = 4.0
+		if factor > tfactor:
+			factor = tfactor
 		dt = 0.8*dt*factor
 	while maxErrRatio > 1.0:
 		print('    using dt = ' + str(dt))
@@ -185,11 +199,11 @@ for n in range(num_steps):
 		# Find the maximum ratio and adapt time-step
 		maxErrRatio = max(errRatio)
 		if max(errRatio) == 0.0:
-			dt = 0.8*4.0*dt
+			dt = 0.8*tfactor*dt
 		else:
 			factor = 1.0/sqrt(maxErrRatio)
-			if factor > 4.0:
-				factor = 4.0
+			if factor > tfactor:
+				factor = tfactor
 			dt = 0.8*dt*factor
 
 	# Update current data point once error meets tolerance
