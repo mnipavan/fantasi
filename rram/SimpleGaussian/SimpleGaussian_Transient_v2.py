@@ -53,7 +53,7 @@ V=FunctionSpace(mesh, 'CG', q_degree)
 V_vec=FunctionSpace(mesh, 'CG', q_degree)
 
 #### define initial values
-rho_D=Expression('1.0', degree = q_degree)
+rho_D=Expression('0.3173 + 2.0 * exp(-2.0 * (x[0] - 0.5) * (x[0] - 0.5)) / sqrt(dnfac)', dnfac = 2.0*np.pi,degree = q_degree)
 rho_curr=interpolate(rho_D,V)
 
 #### Set up LLG equation that will enter variational form
