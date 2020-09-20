@@ -62,7 +62,7 @@ G=Constant((gamFac*tscale*mu0)/(1+alpha**2))            # Scale factor for LLG e
 Temperature parameters
 '''
 Temperature = 300                                                                         # in K
-D = Constant(alpha * gamFac * kBoltzmann * Temperature / ((1+alpha**2)*Ms * magVolume))   # per unit time based on that for gamFac
+D = Constant(alpha * gamFac * tscale * kBoltzmann * Temperature / ((1+alpha**2)*Ms * magVolume))   # per unit time based on that for gamFac
 
 '''
 Definitions for uniaxial anisotropy
