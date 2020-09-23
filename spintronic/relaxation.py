@@ -122,6 +122,8 @@ obj.parameters["timestepping"]["dtmin"] = 1e-18
 obj.parameters["timestepping"]["dtmax"] = 1e-2
 obj.parameters["timestepping"]["stepsizeselector"] = "gustafsson"
 obj.parameters["timestepping"]["convergence_criterion"] = "relative"
+# First time step to try
+obj.parameters["timestepping"]["dt"] = 1e-4
 
 # Set up solver verbosity
 obj.parameters["verbose"] = False
