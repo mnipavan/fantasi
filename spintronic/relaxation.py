@@ -106,7 +106,7 @@ v0=TestFunction(V)
 #a_CN, L_CN  = lhs(F_CN), rhs(F_CN)
 #a_alt, L_alt = lhs(F_alt), rhs(F_alt)
 fpe_rhs  = dot(velocity_n*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
-T = [0, 10]
+T = [0, 0.001]
 
 #### Create VTK file for saving solution
 vtkfile = File('result_files/solution.pvd')
@@ -115,7 +115,7 @@ bc=[]
 print('Initial probability:')
 print(assemble(rho_curr*dx))
 
-obj = ESDIRK(T, rho_curr, fpe_rhs, bcs=[], tdfBC=[], tdf=[])
+obj = ESDIRK(T, rho_curr, fpe_rhs, bcs=[], tdfBC=[], tdf=[], method="mumps")
 
 # Set up time-stepping control
 obj.parameters["timestepping"]["dtmin"] = 1e-18
@@ -126,14 +126,22 @@ obj.parameters["timestepping"]["convergence_criterion"] = "relative"
 obj.parameters["timestepping"]["dt"] = 1e-4
 
 # Set up solver verbosity
-obj.parameters["verbose"] = False
+obj.parameters["verbose"] = True
 
 # Save plot of each time step in VTK format.
-obj.parameters["output"]["plot"] = True
+obj.parameters["output"]["plot"] = False
 
 # Set that the plot of selected step sizes should be saved in jpg.
 # Available choices are jpg, png and eps.
-obj.parameters["output"]["imgformat"] = "jpg"
+#obj.parameters["output"]["imgformat"] = "jpg"
 
 # Call the solver which will do the actual calculation.
 obj.solve()
+
+rho_next=obj.u
+t=obj.t
+print('VTK File saved')
+vtkfile << (rho_next, t)
+print('Updated probability:')
+print(assemble(rho_next*dx))
+
