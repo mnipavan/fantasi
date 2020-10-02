@@ -44,6 +44,9 @@ The velocity equation
 '''
 drdt=Expression("-G*(x[0]-mp)",G=quad_coeff, mp=midPoint, degree=3)
 
+#### Create VTK file for saving solution
+vtkfile = File('GaussianTransient/solution.pvd')
+
 '''
 Set up variational form of Fokker-Planck equation...
 '''
@@ -53,8 +56,16 @@ V=FunctionSpace(mesh, 'CG', q_degree)
 V_vec=FunctionSpace(mesh, 'CG', q_degree)
 
 #### define initial values
-rho_D=Expression('0.3173 + 2.0 * exp(-2.0 * (x[0] - 0.5) * (x[0] - 0.5)) / sqrt(dnfac)', dnfac = 2.0*np.pi,degree = q_degree)
+sgma_val = 0.1
+rho_D=Expression('exp(-0.5 * (x[0] - 0.5) * (x[0] - 0.5) / (sig * sig)) / (sig * sqrt(dnfac))', sig = sgma_val, dnfac = 2.0*np.pi,degree = q_degree)
 rho_curr=interpolate(rho_D,V)
+print('Initial probability (pre-adjustment):')
+err_init=1.0 - assemble(rho_curr*dx)
+print(assemble(rho_curr*dx))
+rho_D=Expression('shift + exp(-0.5 * (x[0] - 0.5) * (x[0] - 0.5) / (sig * sig)) / (sig * sqrt(dnfac))', shift=err_init, sig = sgma_val, dnfac = 2.0*np.pi,degree = q_degree)
+rho_curr=interpolate(rho_D,V)
+print('Initial probability (post-adjustment):')
+print(assemble(rho_curr*dx))
 
 #### Set up LLG equation that will enter variational form
 velocity_n=interpolate(drdt,V_vec)
@@ -73,10 +84,7 @@ v0=TestFunction(V)
 #a_CN, L_CN  = lhs(F_CN), rhs(F_CN)
 #a_alt, L_alt = lhs(F_alt), rhs(F_alt)
 fpe_rhs  = velocity_n*rho_*v0.dx(0)*dx - D*rho_.dx(0)*v0.dx(0)*dx
-T = [0, 100]
-
-print('Initial probability:')
-print(assemble(rho_curr*dx))
+T = [0, 1]
 
 #### Initiate and start time stepper
 if (outInteractive != 0):
@@ -86,24 +94,36 @@ if (outInteractive != 0):
 	plt.ylabel("PDF")
 	plt.show()
 
-obj = ESDIRK(T, rho_curr, fpe_rhs, bcs=[], tdfBC=[], tdf=[])
+obj = ESDIRK(T, rho_curr, fpe_rhs, bcs=[], tdfBC=[], tdf=[], method="mumps")
 
 # Set up time-stepping control
 obj.parameters["timestepping"]["dtmin"] = 1e-18
 obj.parameters["timestepping"]["dtmax"] = 1e-1
+obj.parameters["timestepping"]["dt"] = 1e-5
 obj.parameters["timestepping"]["stepsizeselector"] = "gustafsson"
 obj.parameters["timestepping"]["convergence_criterion"] = "relative"
 
 # Set up solver verbosity
-obj.parameters["verbose"] = False
+obj.parameters["verbose"] = True
 
 # Save plot of each time step in VTK format.
-obj.parameters["output"]["plot"] = True
+obj.parameters["output"]["plot"] = False
 
 # Set that the plot of selected step sizes should be saved in jpg.
 # Available choices are jpg, png and eps.
-obj.parameters["output"]["imgformat"] = "jpg"
+#obj.parameters["output"]["imgformat"] = "jpg"
+n = 1;
 
-# Call the solver which will do the actual calculation.
-obj.solve()
-
+while True:
+	# Call the solver which will do the actual calculation.
+	obj.solve()
+	rho_curr = obj.u
+	print('VTK File saved')
+	vtkfile << (rho_curr, n*T[1])
+	print('Updated probability:')
+	print(assemble(rho_curr*dx))
+	n += 1
+	if n > 2:
+		break
+	obj.t = 0.0
+	obj.dt = 1e-5
