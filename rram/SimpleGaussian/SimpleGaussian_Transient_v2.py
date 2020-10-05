@@ -57,12 +57,12 @@ V_vec=FunctionSpace(mesh, 'CG', q_degree)
 
 #### define initial values
 sgma_val = 0.05
-rho_D=Expression('aFac * exp(-0.5 * (x[0] - 0.5) * (x[0] - 0.5) / (sig * sig))', aFac = 1.0 / (sgma_val*np.sqrt(2.0*np.pi)), sig = sgma_val, dnfac = 2.0*np.pi,degree = q_degree)
+rho_D=Expression('aFac * exp(-0.5 * (x[0] - 0.5) * (x[0] - 0.5) / (sig * sig))', aFac = 0.01, sig = sgma_val, dnfac = 2.0*np.pi,degree = q_degree)
 rho_curr=interpolate(rho_D,V)
 print('Initial probability (pre-adjustment):')
 err_init=1.0 - assemble(rho_curr*dx)
 print(assemble(rho_curr*dx))
-rho_D=Expression('shift + aFac * exp(-0.5 * (x[0] - 0.5) * (x[0] - 0.5) / (sig * sig))', shift=err_init, aFac = 1.0 / (sgma_val*np.sqrt(2.0*np.pi)), sig = sgma_val, dnfac = 2.0*np.pi,degree = q_degree)
+rho_D=Expression('shift + aFac * exp(-0.5 * (x[0] - 0.5) * (x[0] - 0.5) / (sig * sig))', shift=err_init, aFac = 0.02, sig = sgma_val, dnfac = 2.0*np.pi,degree = q_degree)
 rho_curr=interpolate(rho_D,V)
 print('Initial probability (post-adjustment):')
 print(assemble(rho_curr*dx))
