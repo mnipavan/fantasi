@@ -142,9 +142,10 @@ for idx1 in range(0, stageCount):
         vtkfile << (rho_curr, (t*(1+idx) + idx1*T[1]))
         print('Updated probability:')
         print(assemble(rho_curr*dx))
-        startDt = startDt * 10
-        startMaxDt = startMaxDt * 10
-        startMinDt = startMinDt * 10
+
+    startDt = startDt * 10
+    startMaxDt = startMaxDt * 10
+    startMinDt = startMinDt * 10
 
     T[1] = 10 * T[1]
 

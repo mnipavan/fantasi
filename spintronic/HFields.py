@@ -8,15 +8,15 @@ The LLG equation for Zeeman fields defined by (Hx, Hy and Hz)
 The functions expect gam_fac to be "gamma / (1+alpha*alpha)"
 '''
 def dmdt_happx(gam_fac, alph_damp, Hx, q_degree):
-	dmdt=Expression(("G*a*(1-x[0]*x[0])*H","-1.0*G*(m[2]+a*m[0]*m[1])*H","G*(m[1]-a*m[0]*m[2])*H"),G=gam_fac, a=alph_damp, H=Hx, degree=q_degree)
+	dmdt=Expression(("G*a*(1-x[0]*x[0])*H","-1.0*G*(x[2]+a*x[0]*x[1])*H","G*(x[1]-a*x[0]*x[2])*H"),G=gam_fac, a=alph_damp, H=Hx, degree=q_degree)
 	return dmdt
 
 def dmdt_happy(gam_fac, alph_damp, Hy, q_degree):
-	dmdt=Expression(("G*(m[2]-a*m[0]*m[1])*H","G*a*(1-m[1]*m[1])*H","-1.0*G*(m[0]+a*m[1]*m[2])*H"),G=gam_fac, a=alph_damp, H=Hy, degree=q_degree)
+	dmdt=Expression(("G*(x[2]-a*x[0]*x[1])*H","G*a*(1-x[1]*x[1])*H","-1.0*G*(x[0]+a*x[1]*x[2])*H"),G=gam_fac, a=alph_damp, H=Hy, degree=q_degree)
 	return dmdt
 
 def dmdt_happz(gam_fac, alph_damp, Hz, q_degree):
-	dmdt=Expression(("-1.0*G*(m[1]+a*m[0]*m[2])*H","G*(m[0]-a*m[1]*m[2])*H","G*a*(1-m[2]*m[2])*H"),G=gam_fac, a=alph_damp, H=Hz, degree=q_degree)
+	dmdt=Expression(("-1.0*G*(x[1]+a*x[0]*x[2])*H","G*(x[0]-a*x[1]*x[2])*H","G*a*(1-x[2]*x[2])*H"),G=gam_fac, a=alph_damp, H=Hz, degree=q_degree)
 	return dmdt
 
 '''
@@ -27,15 +27,15 @@ These functions can be combined to calculate the shape anisotropy
 effective field
 '''
 def dmdt_huax(gam_fac, alph_damp, Huax, q_degree):
-	dmdt=Expression(("G*a*(1-x[0]*x[0])*H*m[0]","-1.0*G*(m[2]+a*m[0]*m[1])*H*m[0]","G*(m[1]-a*m[0]*m[2])*H*m[0]"),G=gam_fac, a=alph_damp, H=Huax, degree=q_degree)
+	dmdt=Expression(("G*a*(1-x[0]*x[0])*H*x[0]","-1.0*G*(x[2]+a*x[0]*x[1])*H*x[0]","G*(x[1]-a*x[0]*x[2])*H*x[0]"),G=gam_fac, a=alph_damp, H=Huax, degree=q_degree)
 	return dmdt
 
 def dmdt_huapy(gam_fac, alph_damp, Huay, q_degree):
-	dmdt=Expression(("G*(m[2]-a*m[0]*m[1])*H*m[1]","G*a*(1-m[1]*m[1])*H*m[1]","-1.0*G*(m[0]+a*m[1]*m[2])*H*m[1]"),G=gam_fac, a=alph_damp, H=Huay, degree=q_degree)
+	dmdt=Expression(("G*(x[2]-a*x[0]*x[1])*H*x[1]","G*a*(1-x[1]*x[1])*H*x[1]","-1.0*G*(x[0]+a*x[1]*x[2])*H*x[1]"),G=gam_fac, a=alph_damp, H=Huay, degree=q_degree)
 	return dmdt
 
 def dmdt_huaz(gam_fac, alph_damp, Huaz, q_degree):
-	dmdt=Expression(("-1.0*G*(m[1]+a*m[0]*m[2])*H*m[2]","G*(m[0]-a*m[1]*m[2])*H*m[2]","G*a*(1-m[2]*m[2])*H*m[2]"),G=gam_fac, a=alph_damp, H=Huaz, degree=q_degree)
+	dmdt=Expression(("-1.0*G*(x[1]+a*x[0]*x[2])*H*x[2]","G*(x[0]-a*x[1]*x[2])*H*x[2]","G*a*(1-x[2]*x[2])*H*x[2]"),G=gam_fac, a=alph_damp, H=Huaz, degree=q_degree)
 	return dmdt
 
 '''
@@ -64,14 +64,14 @@ def dmdt_mp(gam_fac, alph_damp, Pfix, Pfree, LambFix, LambFree, epsPrime, Icurr,
 	if (LambFix < 1.0):
 		print("ERROR: LambFix must be greater than or equal to 1.0\n")
 		exit()
-	else
+	else:
 		lambFix2=LambFix*LambFix
 
 	lambFree2=0.0
 	if (LambFree < 1.0):
 		print("ERROR: LambFree must be greater than or equal to 1.0\n")
 		exit()
-	else
+	else:
 		lambFree2=LambFree*LambFree
 
 
@@ -92,7 +92,7 @@ def dmdt_mp(gam_fac, alph_damp, Pfix, Pfree, LambFix, LambFree, epsPrime, Icurr,
 	minus_ratio = 1.0
 	if (lambdafreeMinus > 0.0):
 		minus_ratio = lambdafixMinus / lambdafreeMinus
-	
+
 	plus_factor = pfix * lambdafix2 * plus_ratio;
 	minus_factor = pfree * lambdafree2 * minus_ratio;
 	q_plus = plus_factor + minus_factor;
