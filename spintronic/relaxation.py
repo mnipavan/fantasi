@@ -9,7 +9,7 @@ from gryphon import *
 '''
 Plot control
 '''
-outPlotInteractive=0
+outputStats=False
 
 '''
 Mesh
@@ -23,25 +23,30 @@ OutLine = "Mesh dimensions: %d" % mesh.topology().dim()
 print(OutLine)
 
 '''
-Time stepping and time integration
+Control parameters for FEM solver
+'''
+q_degree = 3
+absTol=1e-15
+relTol=1e-5
+
+'''
+Control parameters for time stepping and time integration
 '''
 tscale=1e-9                      # Scale factor to convert simulation time to real-time
 num_steps = 31                   # total number of steps
-#dt = T/float(num_steps)         # time step size
 dt = 1e-18 / tscale              # time step size (in simulation time)
-#dt = 1e-9                        # time step size (in ns)
-q_degree = 3
-#dx=dx(metadata={'quadrature_degree': q_degree})
-absTol=1e-15
-relTol=1e-5
+startDt = 1e-4                   # First time step to try (time-scaled)
+startMaxDt = 1e-2                # Maximum Dt in time-stepper (time-scaled)
+startMinDt = 1e-18               # Minimum Dt in time-stepper (time-scaled)
+T = [0, 1]                       # Time range of simulation per stage (time-scaled)
+stageCount = 10                  # Number of stages to simulate
 
 '''
 Constant parameters for LLG problem
 '''
 kBoltzmann = 1.38064852e-23    # in J/K
 mu0 = 4*np.pi * 1.0e-7         # in N/A^2
-gamFac = 1.7595e11              # in rad/(s.T)
-#gamFac = 1.7595e2              # in rad/(ns.T)
+gamFac = 1.7595e11             # in rad/(s.T)
 
 '''
 Free layer description
@@ -50,16 +55,13 @@ alpha = 0.0135                                   # Unitless damping factor
 Ms =450e3                                        # in A/m
 t_FL=1.0e-9                                      # thickness of FL
 diameter=40.0e-9                                 # diameter of FL with circular cross-section
-#length=50e-9
-#width=3*length
 magVolume = t_FL * (diameter**2) * (np.pi/4.0)   # in m^3
-#magVolume=(np.pi/4)*length*width*thickness
-G=Constant((gamFac*tscale*mu0)/(1+alpha**2))            # Scale factor for LLG equation
+G=Constant((gamFac*tscale*mu0)/(1+alpha**2))     # Scale factor for LLG equation (time-scaled)
 
 '''
 Temperature parameters
 '''
-Temperature = 300                                                                         # in K
+Temperature = 300                                                                                  # in K
 D = Constant(alpha * gamFac * tscale * kBoltzmann * Temperature / ((1+alpha**2)*Ms * magVolume))   # per unit time based on that for gamFac
 
 '''
@@ -76,72 +78,73 @@ The LLG equation
 dmdt=Expression(("-G*(a*x[0]*x[2]+x[1])*H*x[2]","G*(x[0]-a*x[1]*x[2])*H*x[2]","a*G*(1-x[2]*x[2])*H*x[2]"),G=G, a=alpha, H=H_uni, degree=1)
 
 '''
-Set up variational form of Fokker-Planck equation...
+Set up variational form of Fokker-Planck equation for initial value problem (IVP)
 '''
 
 #### Basis space
-#V=FunctionSpace(mesh,'P',3)
-#V_vec=VectorFunctionSpace(mesh,'P',degree=3, dim=3)
 V=FunctionSpace(mesh,'CG',q_degree)
 V_vec=VectorFunctionSpace(mesh,'CG',degree=q_degree,dim=3)
 
-#### define initial value
+#### Define initial value on the mesh
 rho_D=Expression('1/(4*pi)', degree = 1)
 rho_curr=interpolate(rho_D,V)
 
-#### Set up LLG equation that will enter variational form
+#### Set up LLG equation to be solved
 velocity_n=interpolate(dmdt,V_vec)
 velocity_p=velocity_n
 
 #### Set up variational form
-#rho_next_N=TrialFunction(V)
-#rho_next_alt=TrialFunction(V)
-#v0=TestFunction(V)
-#v1=TestFunction(V)
 rho_=TrialFunction(V)
 v0=TestFunction(V)
-
-#F_CN  = (rho_next_CN  - rho_curr)*v0*dx - 0.5*dt*dot(velocity_n*rho_next_CN , grad(v0))*dx + 0.5*dt*D*dot(grad(rho_next_CN ),grad(v0))*dx - 0.5*dt*dot(velocity_p*rho_curr,grad(v0))*dx + 0.5*dt*D*dot(grad(rho_curr),grad(v0))*dx
-#F_alt = (rho_next_alt - rho_curr)*v1*dx - 0.6*dt*dot(velocity_n*rho_next_alt, grad(v1))*dx + 0.6*dt*D*dot(grad(rho_next_alt),grad(v1))*dx - 0.4*dt*dot(velocity_p*rho_curr,grad(v1))*dx + 0.4*dt*D*dot(grad(rho_curr),grad(v1))*dx
-#a_CN, L_CN  = lhs(F_CN), rhs(F_CN)
-#a_alt, L_alt = lhs(F_alt), rhs(F_alt)
 fpe_rhs  = dot(velocity_n*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
-T = [0, 0.001]
 
-#### Create VTK file for saving solution
+#### Create VTK file for saving solution and save initial value
 vtkfile = File('result_files/solution.pvd')
-bc=[]
+print('VTK File saved')
+vtkfile << (rho_curr, 0)
 
+#### Perform initial integration to get estimated error in the beginning
 print('Initial probability:')
 print(assemble(rho_curr*dx))
 
-obj = ESDIRK(T, rho_curr, fpe_rhs, bcs=[], tdfBC=[], tdf=[], method="mumps")
+'''
+Using Gryphon toolbox to perform time-stepping
+'''
+#### Start the solver to calculate transient solution
+for idx1 in range(0, stageCount):
+    for idx in range(0, stageCount):
+        #### Get initial Gryphon object
+        obj = ESDIRK(T, rho_curr, fpe_rhs, bcs=[], tdfBC=[], tdf=[], method="mumps")
 
-# Set up time-stepping control
-obj.parameters["timestepping"]["dtmin"] = 1e-18
-obj.parameters["timestepping"]["dtmax"] = 1e-2
-obj.parameters["timestepping"]["stepsizeselector"] = "gustafsson"
-obj.parameters["timestepping"]["convergence_criterion"] = "relative"
-# First time step to try
-obj.parameters["timestepping"]["dt"] = 1e-4
+        #### Set up Gryphon time-stepping control
+        obj.parameters["timestepping"]["dtmin"] = startMinDt
+        obj.parameters["timestepping"]["dtmax"] = startMaxDt
+        obj.parameters["timestepping"]["stepsizeselector"] = "gustafsson"      # Time step adaptation scheme
+        obj.parameters["timestepping"]["convergence_criterion"] = "relative"   # Error check scheme
+        obj.parameters["timestepping"]["dt"] = startDt                         # First time step to try
 
-# Set up solver verbosity
-obj.parameters["verbose"] = True
+        #### Set up solver verbosity
+        obj.parameters["verbose"] = True
 
-# Save plot of each time step in VTK format.
-obj.parameters["output"]["plot"] = False
+        #### Save plot of solution at every internal time step
+        obj.parameters["output"]["plot"] = False
 
-# Set that the plot of selected step sizes should be saved in jpg.
-# Available choices are jpg, png and eps.
-#obj.parameters["output"]["imgformat"] = "jpg"
+        #### Set that the plot of selected step sizes should be saved in jpg.
+        #### Available choices are jpg, png and eps.
+        if outputStats:
+            obj.parameters["output"]["imgformat"] = "jpg"
 
-# Call the solver which will do the actual calculation.
-obj.solve()
+        obj.solve()
 
-rho_next=obj.u
-t=obj.t
-print('VTK File saved')
-vtkfile << (rho_next, t)
-print('Updated probability:')
-print(assemble(rho_next*dx))
+        rho_curr=obj.u
+        t=obj.t
+        print('VTK File saved')
+        vtkfile << (rho_curr, (t*(1+idx) + idx1*T[1]))
+        print('Updated probability:')
+        print(assemble(rho_curr*dx))
+        startDt = startDt * 10
+        startMaxDt = startMaxDt * 10
+        startMinDt = startMinDt * 10
+
+    T[1] = 10 * T[1]
 
