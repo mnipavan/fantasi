@@ -2,10 +2,11 @@
 #PBS -l walltime=24:00:00
 #PBS -l mpiprocs=8
 #PBS -l ncpus=8
+#PBS -l mem=16gb
 #PBS -j oe
 
-export SIMDIR=/home/finesse/xfong/proj/fpe/fantasi/spintronic
-export FNAME=relaxation_1.py
+export SIMDIR=~/proj/fpe/fantasi/spintronic
+export FNAME=large_field_0.py
 cd $TMPDIR
 rsync -az ${SIMDIR}/${FNAME} ./
 rsync -az ${SIMDIR}/HFields.py ./
@@ -16,5 +17,6 @@ if [ -f ${FNAME} ]; then
 fi
 if [ -d result_files ]; then
     echo "Directory containing final result files found! Copying back to home directory"
-    rsync -az ./result_files ${SIMDIR}/.
+    tar czf ./${FNAME}.tgz ./result_files
+    rsync -az ./${FNAME}.tgz ${SIMDIR}/.
 fi
