@@ -1,8 +1,9 @@
 #!/bin/bash
-#PBS -l walltime=24:00:00
+#PBS -l walltime=120:00:00
 #PBS -l mpiprocs=8
 #PBS -l ncpus=8
 #PBS -l mem=16gb
+#PBS -l vmem=16gb
 #PBS -j oe
 
 export SIMDIR=~/proj/fpe/fantasi/spintronic

@@ -106,7 +106,7 @@ v0=TestFunction(V)
 fpe_rhs  = dot((velocity_0+velocity_1)*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
 
 #### Create VTK file for saving solution and save initial value
-vtkfile = File('large_field_0/solution.pvd')
+vtkfile = File('result_files/solution.pvd')
 print('VTK File saved')
 vtkfile << (rho_curr, 0)
 
