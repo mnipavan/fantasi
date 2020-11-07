@@ -16,7 +16,7 @@ rsync -az ${SIMDIR}/${SCRIPT} ./
 rsync -az ${SIMDIR}/HFields.py ./
 rsync -az ${SIMDIR}/meshes ./
 if [ -f ${SCRIPT} ]; then
-    module load singularity openmpi
+    module load singularity cuda/10.0 gdrcopy libnl libibverbs openucx openmpi
     singularity run -B $TMPDIR /opt/containers/ubuntu/18/fenics_v1_10.sif ${MPICOMMAND} python ./${SCRIPT}
 fi
 if [ -d ${FNAME}_results ]; then
