@@ -76,7 +76,7 @@ H_uni=Constant((2*Ku2)/(mu0*Ms))
 '''
 Parameters for the large field being applied
 '''
-Happ_y = Constant(100*H_uni)
+Happ_y = Constant(5*H_uni)
 
 '''
 The LLG equation
@@ -106,9 +106,12 @@ v0=TestFunction(V)
 fpe_rhs  = dot((velocity_0+velocity_1)*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
 
 #### Create VTK file for saving solution and save initial value
-vtkfile = File('result_files/solution.pvd')
+vtkfile = File('large_field_0_results/solution.pvd')
 print('VTK File saved')
 vtkfile << (rho_curr, 0)
+
+#### Create time series file to save nodal values
+timeseries_rho = TimeSeries('large_field_0_results/rho_series')
 
 #### Perform initial integration to get estimated error in the beginning
 print('Initial probability:')
@@ -156,3 +159,4 @@ for idx1 in range(0, stageCount):
 
     T[1] = 10 * T[1]
 
+timeseries_rho.store(rho_curr.vector(), 0.0)

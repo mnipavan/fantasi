@@ -100,9 +100,12 @@ v0=TestFunction(V)
 fpe_rhs  = dot(velocity_n*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
 
 #### Create VTK file for saving solution and save initial value
-vtkfile = File('result_files/solution.pvd')
+vtkfile = File('relaxation_1_results/solution.pvd')
 print('VTK File saved')
 vtkfile << (rho_curr, 0)
+
+#### Create time series file to save nodal values
+timeseries_rho = TimeSeries('relaxation_1_results/rho_series')
 
 #### Perform initial integration to get estimated error in the beginning
 print('Initial probability:')
@@ -150,3 +153,4 @@ for idx1 in range(0, stageCount):
 
     T[1] = 10 * T[1]
 
+timeseries_rho.store(rho_curr.vector(), 0.0)
