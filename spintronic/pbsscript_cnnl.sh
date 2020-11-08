@@ -6,12 +6,13 @@
 #PBS -j oe
 
 export SIMDIR=~/proj/fpe/fantasi/spintronic
-export FNAME=large_field_0
+export FNAME=relaxation_3
 export SCRIPT=${FNAME}.py
 export MPICOMMAND="mpirun -np 8"
 cd $TMPDIR
 rsync -az ${SIMDIR}/${SCRIPT} ./
 rsync -az ${SIMDIR}/HFields.py ./
+rsync -az ${SIMDIR}/rho_series.h5 ./
 rsync -az ${SIMDIR}/meshes ./
 if [ -f ${SCRIPT} ]; then
     module load singularity cuda/10.0 gdrcopy libnl libibverbs openucx openmpi pbspro
