@@ -9,6 +9,7 @@ export SIMDIR=~/proj/fpe/fantasi/spintronic
 export FNAME=relaxation_3
 export SCRIPT=${FNAME}.py
 export MPICOMMAND="mpirun -np 8"
+export OMP_NUM_THREADS=1
 cd $TMPDIR
 rsync -az ${SIMDIR}/${SCRIPT} ./
 rsync -az ${SIMDIR}/HFields.py ./
