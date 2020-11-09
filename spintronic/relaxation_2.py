@@ -108,7 +108,7 @@ print('VTK File saved')
 vtkfile << (rho_curr, 0)
 
 #### Create time series file to save nodal values
-timeseries_rho = TimeSeries('relaxation_1_results/rho_series')
+timeseries_rho = TimeSeries('relaxation_2_results/rho_series')
 
 #### Perform initial integration to get estimated error in the beginning
 print('Initial probability:')

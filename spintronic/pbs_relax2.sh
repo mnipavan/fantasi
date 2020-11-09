@@ -3,7 +3,6 @@
 #PBS -l mpiprocs=8
 #PBS -l ncpus=8
 #PBS -l mem=16gb
-#PBS -l vmem=16gb
 #PBS -j oe
 
 export SIMDIR=~/proj/fpe/fantasi/spintronic

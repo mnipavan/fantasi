@@ -127,7 +127,7 @@ Using Gryphon toolbox to perform time-stepping
 for idx1 in range(0, stageCount):
     for idx in range(0, stageCount):
         #### Get initial Gryphon object
-        obj = ESDIRK(T, rho_curr, fpe_rhs, bcs=[], tdfBC=[], tdf=[], method="superlu_dist")
+        obj = ESDIRK(T, rho_curr, fpe_rhs, bcs=[], tdfBC=[], tdf=[], method="mumps")
 
         #### Set up Gryphon time-stepping control
         obj.parameters["timestepping"]["dtmin"] = startMinDt
