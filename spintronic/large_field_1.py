@@ -21,7 +21,7 @@ outputStats=False
 '''
 FANTASI simulation name
 '''
-simName = "relaxation_3"
+simName = "large_field_1"
 
 '''
 Mesh
@@ -85,8 +85,14 @@ Ku2=Eb/magVolume
 H_uni=Constant((2*Ku2)/(mu0*Ms))
 
 '''
+Parameters for the large field being applied
+'''
+Happ_y = Constant(5*H_uni)
+
+'''
 The LLG equation
 '''
+dmdt_field=dmdt_happy(gam_fac=G, alph_damp=alpha, Hy=Happ_y, q_degree=1)
 dmdt=dmdt_huaz(gam_fac=G, alph_damp=alpha, Huaz=H_uni, q_degree=1)
 
 '''
@@ -97,21 +103,18 @@ Set up variational form of Fokker-Planck equation for initial value problem (IVP
 V=FunctionSpace(mesh,'CG',q_degree)
 V_vec=VectorFunctionSpace(mesh,'CG',degree=q_degree,dim=3)
 
-#### Create time series file to import nodal values
-timeseries_rho = TimeSeries('rho_series')
-
 #### Define initial value on the mesh
-rho_curr=Function(V)
-timeseries_rho.retrieve(rho_curr.vector(),0.0)
+rho_D=Expression('1/(4*pi)', degree = 1)
+rho_curr=interpolate(rho_D,V)
 
 #### Set up LLG equation to be solved
-velocity_n=interpolate(dmdt,V_vec)
-velocity_p=velocity_n
+velocity_0=interpolate(dmdt,V_vec)
+velocity_1=interpolate(dmdt_field,V_vec)
 
 #### Set up variational form
 rho_=TrialFunction(V)
 v0=TestFunction(V)
-fpe_rhs  = dot(velocity_n*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
+fpe_rhs  = dot((velocity_0+velocity_1)*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
 
 #### Create VTK file for saving solution and save initial value
 outDirName=simName+"_results"
