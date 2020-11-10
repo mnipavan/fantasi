@@ -1,16 +1,16 @@
 #!/bin/bash
 #PBS -l walltime=120:00:00
-#PBS -l mpiprocs=8
-#PBS -l ncpus=8
-#PBS -l mem=16gb
+#PBS -l mpiprocs=16
+#PBS -l ncpus=16
+#PBS -l mem=32gb
 #PBS -j oe
 
 OUTDATE=`date`
 echo "Started at $OUTDATE"
 export SIMDIR=~/proj/fpe/fantasi/spintronic
-export FNAME=relaxation_3
+export FNAME=relaxation_4
 export SCRIPT=${FNAME}.py
-export MPICOMMAND="mpirun -np 8"
+export MPICOMMAND="mpirun -np 16"
 export OMP_NUM_THREADS=1
 cd $TMPDIR
 rsync -az ${SIMDIR}/${SCRIPT} ./

@@ -76,7 +76,7 @@ H_uni=Constant((2*Ku2)/(mu0*Ms))
 '''
 The LLG equation
 '''
-dmdt=dmdt_huay(gam_fac=G, alph_damp=alpha, Huaz=H_uni, q_degree=1)
+dmdt=dmdt_huay(gam_fac=G, alph_damp=alpha, Huay=H_uni, q_degree=1)
 
 '''
 Set up variational form of Fokker-Planck equation for initial value problem (IVP)
@@ -103,12 +103,12 @@ v0=TestFunction(V)
 fpe_rhs  = dot(velocity_n*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
 
 #### Create VTK file for saving solution and save initial value
-vtkfile = File('relaxation_2_results/solution.pvd')
+vtkfile = File('relaxation_4_results/solution.pvd')
 print('VTK File saved')
 vtkfile << (rho_curr, 0)
 
 #### Create time series file to save nodal values
-timeseries_rho = TimeSeries('relaxation_2_results/rho_series')
+timeseries_rho = TimeSeries('relaxation_4_results/rho_series')
 
 #### Perform initial integration to get estimated error in the beginning
 print('Initial probability:')
