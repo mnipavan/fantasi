@@ -30,7 +30,7 @@ def dmdt_huax(gam_fac, alph_damp, Huax, q_degree):
 	dmdt=Expression(("G*a*(1-x[0]*x[0])*H*x[0]","-1.0*G*(x[2]+a*x[0]*x[1])*H*x[0]","G*(x[1]-a*x[0]*x[2])*H*x[0]"),G=gam_fac, a=alph_damp, H=Huax, degree=q_degree)
 	return dmdt
 
-def dmdt_huapy(gam_fac, alph_damp, Huay, q_degree):
+def dmdt_huay(gam_fac, alph_damp, Huay, q_degree):
 	dmdt=Expression(("G*(x[2]-a*x[0]*x[1])*H*x[1]","G*a*(1-x[1]*x[1])*H*x[1]","-1.0*G*(x[0]+a*x[1]*x[2])*H*x[1]"),G=gam_fac, a=alph_damp, H=Huay, degree=q_degree)
 	return dmdt
 
