@@ -16,6 +16,9 @@ export MPICOMMAND=""
 cd $TMPDIR
 rsync -az ${SIMDIR}/${SCRIPT} ./
 rsync -az ${SIMDIR}/HFields.py ./
+if [ -f ${SIMDIR}/rho_series.h5 ]; then
+    rsync -az ${SIMDIR}/rho_series.h5 ./
+fi
 rsync -az ${SIMDIR}/meshes ./
 if [ -f ${SCRIPT} ]; then
     module load singularity
