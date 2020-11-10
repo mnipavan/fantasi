@@ -19,6 +19,11 @@ Plot control
 outputStats=False
 
 '''
+FANTASI simulation name
+'''
+simName = "relaxation_4"
+
+'''
 Mesh
 '''
 global_normal = Expression(("x[0]", "x[1]", "x[2]"), degree=3)
@@ -109,12 +114,13 @@ v0=TestFunction(V)
 fpe_rhs  = dot(velocity_n*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
 
 #### Create VTK file for saving solution and save initial value
-vtkfile = File('relaxation_4_results/solution.pvd')
+outDirName=simName+"_results"
+vtkfile = File(outDirName+"/solution.pvd")
 print('VTK File saved')
 vtkfile << (rho_curr, 0)
 
 #### Create time series file to save nodal values
-timeseries_rho = TimeSeries('relaxation_4_results/rho_series')
+timeseries_rho = TimeSeries(outDirName+"/rho_series")
 
 #### Perform initial integration to get estimated error in the beginning
 print('Initial probability:')
