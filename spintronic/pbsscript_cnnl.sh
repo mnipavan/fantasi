@@ -5,6 +5,8 @@
 #PBS -l mem=16gb
 #PBS -j oe
 
+OUTDATE=`date`
+echo "Started at $OUTDATE"
 export SIMDIR=~/proj/fpe/fantasi/spintronic
 export FNAME=relaxation_3
 export SCRIPT=${FNAME}.py
@@ -19,6 +21,8 @@ if [ -f ${SCRIPT} ]; then
     module load singularity cuda/10.0 gdrcopy libnl libibverbs openucx openmpi pbspro
     singularity run -B $TMPDIR -B ${PBSPROPATH}/spool /opt/containers/ubuntu/18/fenics_v1_10.sif ${MPICOMMAND} python ./${SCRIPT}
 fi
+OUTDATE=`date`
+echo "Simulation ended at $OUTDATE"
 if [ -d ${FNAME}_results ]; then
     echo "Directory containing final result files found! Copying back to home directory"
     tar czf ./${FNAME}.tgz ./${FNAME}_results
