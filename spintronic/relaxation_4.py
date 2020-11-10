@@ -10,7 +10,8 @@ from HFields import *
 '''
 FEniCS controls
 '''
-parameters["num_threads"] = 8
+parameters["linear_algebra_backend"] = "PETSc"
+parameters["mesh_partitioner"] = "ParMETIS"
 
 '''
 Plot control
