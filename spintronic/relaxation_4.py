@@ -8,6 +8,11 @@ from gryphon import *
 from HFields import *
 
 '''
+FEniCS controls
+'''
+parameters["num_threads"] = 8
+
+'''
 Plot control
 '''
 outputStats=False
