@@ -19,7 +19,8 @@ rsync -az ${SIMDIR}/HFields.py ./
 rsync -az ${SIMDIR}/meshes ./
 if [ -f ${SCRIPT} ]; then
     module load singularity
-    singularity run -B $TMPDIR /opt/containers/ubuntu/18/fenics_v1_10.sif ${MPICOMMAND} python ./${SCRIPT}
+    singularity run -B $TMPDIR /opt/containers/ubuntu/18/fenics_v1_10.sif ${MPICOMMAND} python ./${SCRIPT} \
+    1> >(tee ${PBS_O_WORKDIR}/${PBS_JOBID}.${PBS_JOBNAME}.stdout) 2> >(tee ${PBS_O_WORKDIR}/${PBS_JOBID}.${PBS_JOBNAME}.stderr)
 fi
 OUTDATE=`date`
 echo "Simulation ended at $OUTDATE"

@@ -19,7 +19,8 @@ rsync -az ${SIMDIR}/rho_series.h5 ./
 rsync -az ${SIMDIR}/meshes ./
 if [ -f ${SCRIPT} ]; then
     module load singularity cuda/10.0 gdrcopy libnl libibverbs openucx openmpi pbspro
-    singularity run -B $TMPDIR -B ${PBSPROPATH}/spool /opt/containers/ubuntu/18/fenics_v1_10.sif ${MPICOMMAND} python ./${SCRIPT}
+    singularity run -B $TMPDIR -B ${PBSPROPATH}/spool /opt/containers/ubuntu/18/fenics_v1_10.sif ${MPICOMMAND} python ./${SCRIPT} \
+    1> >(tee ${PBS_O_WORKDIR}/${PBS_JOBID}.${PBS_JOBNAME}.stdout) 2> >(tee ${PBS_O_WORKDIR}/${PBS_JOBID}.${PBS_JOBNAME}.stderr)
 fi
 OUTDATE=`date`
 echo "Simulation ended at $OUTDATE"
