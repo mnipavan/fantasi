@@ -21,7 +21,7 @@ outputStats=False
 '''
 FANTASI simulation name
 '''
-simName = "stt_5"
+simName = "stt_0"
 
 '''
 Mesh
