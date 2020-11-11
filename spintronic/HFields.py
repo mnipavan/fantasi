@@ -57,7 +57,7 @@ Ms_          : saturation magnetization of free layer
 mp           : 3d magnetization vector for fixed layer magnetization (the function will normalize this vector)
 '''
 
-def dmdt_mp(gam_fac, alph_damp, Pfix, Pfree, LambFix, LambFree, epsPrime, Icurr, vol, Ms_, mp):
+def dmdt_mp(gam_fac, alph_damp, Pfix, Pfree, LambFix, LambFree, epsPrime, Icurr, vol, Ms_, mp, q_degree):
 	HBAR=1.05457173E-34
 	QE=1.60217646E-19
 	lambFix2=0.0
@@ -93,8 +93,8 @@ def dmdt_mp(gam_fac, alph_damp, Pfix, Pfree, LambFix, LambFree, epsPrime, Icurr,
 	if (lambdafreeMinus > 0.0):
 		minus_ratio = lambdafixMinus / lambdafreeMinus
 
-	plus_factor = pfix * lambdafix2 * plus_ratio;
-	minus_factor = pfree * lambdafree2 * minus_ratio;
+	plus_factor = Pfix * lambFix2 * plus_ratio;
+	minus_factor = Pfree * lambFree2 * minus_ratio;
 	q_plus = plus_factor + minus_factor;
 	q_minus = plus_factor - minus_factor;
 	lplus2 = lambdafreePlus * lambdafixPlus;
@@ -128,6 +128,15 @@ def dmdt_mp(gam_fac, alph_damp, Pfix, Pfree, LambFix, LambFree, epsPrime, Icurr,
 	# mxpxm.y = pxm.x*mz - pxm.z*mx
 	# mxpxm.z = mx*pxm.y - my*pxm.x
 
-	dmdt=Expression(("(gilb * (B - alph_damp * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (py*x[2] - pz*x[1]) + (gilb * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[1]*(px*x[1] - py*x[0]) - x[2]*(x[0]*pz - x[2]*px))", "(gilb * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (x[0]*pz - x[2]*px) + (gilb * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[2]*(py*x[2] - pz*x[1]) - x[0]*(px*x[1] - py*x[0]))", "(gilb * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (px*x[1] - py*x[0]) + (gilb * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[0]*(x[0]*pz - x[2]*px) - x[1]*(py*x[2] - pz*x[1]))"), gilb=((gam_fac*beta) / (1.0 + alph_damp*alph_damp)), alpha=alph_damp, B=epsPrime, q_minus=q_minus, q_plus=q_plus, lplus2=lplus2, lminus2=lminus2, px=mp[0], py=mp[1], pz=mp[2])
+	# Form compiler needs variables that are not expressions of other variables. gilb needs
+	# to be factored into a constant part and the part that depends on current
+	# gilb=((gam_fac*beta) / (1.0 + alph_damp*alph_damp))
+	#     = beta * (gam_fac / (1.0 + alph_damp*alph_damp)
+	# beta=(HBAR / vol) * ( Icurr / (2.0 * Ms_ * QE * pnorm) )
+	#     = Icurr * (HBAR / (vol * 2.0 * Ms_ *QE *pnorm))
+	# gilb = gilbF * Icurr
+	gilbF=Constant((gam_fac / (1.0 + alph_damp*alph_damp)) * (HBAR / ( 2.0 * vol * Ms_ * QE * pnorm)))
+	
+	dmdt=Expression(("(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (py*x[2] - pz*x[1]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[1]*(px*x[1] - py*x[0]) - x[2]*(x[0]*pz - x[2]*px))", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (x[0]*pz - x[2]*px) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[2]*(py*x[2] - pz*x[1]) - x[0]*(px*x[1] - py*x[0]))", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (px*x[1] - py*x[0]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[0]*(x[0]*pz - x[2]*px) - x[1]*(py*x[2] - pz*x[1]))"), gilb=gilbF, Icurr=Icurr, alpha=alph_damp, B=epsPrime, q_minus=q_minus, q_plus=q_plus, lplus2=lplus2, lminus2=lminus2, px=mp[0], py=mp[1], pz=mp[2], degree=q_degree)
 	return dmdt
 
