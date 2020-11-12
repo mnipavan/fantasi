@@ -37,7 +37,7 @@ print(OutLine)
 '''
 Control parameters for FEM solver
 '''
-q_degree = 3
+q_degree = 2
 absTol=1e-15
 relTol=1e-5
 
@@ -93,8 +93,8 @@ P_free=0.5
 Lambda_fix=1.0
 Lambda_free=1.0
 epsPrime=0.0
-Icurr = 100e-6
-mp=np.array([0.0, -1.0, 0.0])
+Icurr = 1e-3
+mp=np.array([0.0, 1.0, 0.0])
 
 '''
 The LLG equation
