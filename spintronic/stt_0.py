@@ -37,7 +37,7 @@ print(OutLine)
 '''
 Control parameters for FEM solver
 '''
-q_degree = 2
+q_degree = 3
 absTol=1e-15
 relTol=1e-5
 
