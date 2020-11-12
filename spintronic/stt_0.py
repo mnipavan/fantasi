@@ -93,8 +93,8 @@ P_free=0.5
 Lambda_fix=1.0
 Lambda_free=1.0
 epsPrime=0.0
-Icurr = 1e-3
-mp=np.array([0.0, 1.0, 0.0])
+Icurr = 100e-6
+mp=np.array([0.0, -1.0, 0.0])
 
 '''
 The LLG equation
