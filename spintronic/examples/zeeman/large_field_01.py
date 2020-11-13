@@ -21,7 +21,7 @@ outputStats=False
 '''
 FANTASI simulation name
 '''
-simName = "large_field_0"
+simName = "large_field_01"
 
 '''
 Mesh
@@ -37,7 +37,7 @@ print(OutLine)
 '''
 Control parameters for FEM solver
 '''
-q_degree = 3
+q_degree = 2
 absTol=1e-15
 relTol=1e-5
 
@@ -92,8 +92,8 @@ Happ_y = Constant(5*H_uni)
 '''
 The LLG equation
 '''
-dmdt_field=dmdt_happy(gam_fac=G, alph_damp=alpha, Hy=Happ_y, q_degree=1)
-dmdt=dmdt_huaz(gam_fac=G, alph_damp=alpha, Huaz=H_uni, q_degree=1)
+dmdt_field=dmdt_happy(gam_fac=G, alph_damp=alpha, Hy=Happ_y, q_degree=q_degree)
+dmdt=dmdt_huaz(gam_fac=G, alph_damp=alpha, Huaz=H_uni, q_degree=q_degree)
 
 '''
 Set up variational form of Fokker-Planck equation for initial value problem (IVP)

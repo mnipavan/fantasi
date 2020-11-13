@@ -21,7 +21,7 @@ outputStats=False
 '''
 FANTASI simulation name
 '''
-simName = "large_field_2"
+simName = "large_field_03"
 
 '''
 Mesh
@@ -92,8 +92,8 @@ Happ_z = Constant(5*H_uni)
 '''
 The LLG equation
 '''
-dmdt_field=dmdt_happz(gam_fac=G, alph_damp=alpha, Hz=Happ_z, q_degree=1)
-dmdt=dmdt_huaz(gam_fac=G, alph_damp=alpha, Huaz=H_uni, q_degree=1)
+dmdt_field=dmdt_happz(gam_fac=G, alph_damp=alpha, Hz=Happ_z, q_degree=q_degree)
+dmdt=dmdt_huaz(gam_fac=G, alph_damp=alpha, Huaz=H_uni, q_degree=q_degree)
 
 '''
 Set up variational form of Fokker-Planck equation for initial value problem (IVP)

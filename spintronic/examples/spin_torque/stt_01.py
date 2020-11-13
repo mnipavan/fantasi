@@ -21,7 +21,7 @@ outputStats=False
 '''
 FANTASI simulation name
 '''
-simName = "large_field_1"
+simName = "stt_01"
 
 '''
 Mesh
@@ -51,7 +51,8 @@ startDt = 1e-4                   # First time step to try (time-scaled)
 startMaxDt = 1e-2                # Maximum Dt in time-stepper (time-scaled)
 startMinDt = 1e-18               # Minimum Dt in time-stepper (time-scaled)
 T = [0, 1]                       # Time range of simulation per stage (time-scaled)
-stageCount = 10                  # Number of stages to simulate
+stageCountOuter = 1              # Number of stages to simulate
+stageCountInner = 20             # Number of stages to simulate
 
 '''
 Constant parameters for LLG problem
@@ -85,15 +86,21 @@ Ku2=Eb/magVolume
 H_uni=Constant((2*Ku2)/(mu0*Ms))
 
 '''
-Parameters for the large field being applied
+Definitions for spin torque
 '''
-Happ_y = Constant(5*H_uni)
+P_fix=0.5
+P_free=0.5
+Lambda_fix=1.0
+Lambda_free=1.0
+epsPrime=0.0
+Icurr = 100e-6
+mp=np.array([0.0, -1.0, 0.0])
 
 '''
 The LLG equation
 '''
-dmdt_field=dmdt_happy(gam_fac=G, alph_damp=alpha, Hy=Happ_y, q_degree=1)
-dmdt=dmdt_huaz(gam_fac=G, alph_damp=alpha, Huaz=H_uni, q_degree=1)
+dmdt=dmdt_huay(gam_fac=G, alph_damp=alpha, Huay=H_uni, q_degree=q_degree)
+dmdt_stt=dmdt_mp(gam_fac=G, alph_damp=alpha, Pfix=P_fix, Pfree=P_free, LambFree=Lambda_free, LambFix=Lambda_fix, Ms_=Ms, Icurr=Icurr, vol=magVolume, epsPrime=epsPrime, mp=mp, q_degree=q_degree)
 
 '''
 Set up variational form of Fokker-Planck equation for initial value problem (IVP)
@@ -103,18 +110,21 @@ Set up variational form of Fokker-Planck equation for initial value problem (IVP
 V=FunctionSpace(mesh,'CG',q_degree)
 V_vec=VectorFunctionSpace(mesh,'CG',degree=q_degree,dim=3)
 
+#### Create time series file to import nodal values
+timeseries_rho = TimeSeries('rho_series')
+
 #### Define initial value on the mesh
-rho_D=Expression('1/(4*pi)', degree = 1)
-rho_curr=interpolate(rho_D,V)
+rho_curr=Function(V)
+timeseries_rho.retrieve(rho_curr.vector(),0.0)
 
 #### Set up LLG equation to be solved
-velocity_0=interpolate(dmdt,V_vec)
-velocity_1=interpolate(dmdt_field,V_vec)
+velocity_uniaxial=interpolate(dmdt,V_vec)
+velocity_stt=interpolate(dmdt_stt,V_vec)
 
 #### Set up variational form
 rho_=TrialFunction(V)
 v0=TestFunction(V)
-fpe_rhs  = dot((velocity_0+velocity_1)*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
+fpe_rhs  = dot((velocity_uniaxial+velocity_stt)*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
 
 #### Create VTK file for saving solution and save initial value
 outDirName=simName+"_results"
@@ -133,8 +143,8 @@ print(assemble(rho_curr*dx))
 Using Gryphon toolbox to perform time-stepping
 '''
 #### Start the solver to calculate transient solution
-for idx1 in range(0, stageCount):
-    for idx in range(0, stageCount):
+for idx1 in range(0, stageCountOuter):
+    for idx in range(0, stageCountInner):
         #### Get initial Gryphon object
         obj = ESDIRK(T, rho_curr, fpe_rhs, bcs=[], tdfBC=[], tdf=[], method="mumps")
 
