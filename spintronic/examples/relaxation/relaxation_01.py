@@ -20,7 +20,7 @@ outputStats=False
 '''
 FANTASI simulation name
 '''
-simName = "relaxation_0"
+simName = "relaxation_01"
 
 '''
 Mesh
@@ -63,11 +63,11 @@ gamFac = 1.7595e11             # in rad/(s.T)
 Free layer description
 '''
 alpha = 0.0135                                   # Unitless damping factor
-Ms =450e3                                        # in A/m
-t_FL=1.0e-9                                      # thickness of FL
-diameter=40.0e-9                                 # diameter of FL with circular cross-section
+Ms = 450e3                                       # in A/m
+t_FL = 1.0e-9                                    # thickness of FL
+diameter = 40.0e-9                               # diameter of FL with circular cross-section
 magVolume = t_FL * (diameter**2) * (np.pi/4.0)   # in m^3
-G=Constant((gamFac*tscale*mu0)/(1+alpha**2))     # Scale factor for LLG equation (time-scaled)
+G = Constant((gamFac*tscale*mu0)/(1+alpha**2))   # Scale factor for LLG equation (time-scaled)
 
 '''
 Temperature parameters
@@ -86,7 +86,7 @@ H_uni=Constant((2*Ku2)/(mu0*Ms))
 '''
 The LLG equation
 '''
-dmdt=Expression(("-G*(a*x[0]*x[2]+x[1])*H*x[2]","G*(x[0]-a*x[1]*x[2])*H*x[2]","a*G*(1-x[2]*x[2])*H*x[2]"),G=G, a=alpha, H=H_uni, degree=1)
+dmdt=Expression(("-G*(a*x[0]*x[2]+x[1])*H*x[2]","G*(x[0]-a*x[1]*x[2])*H*x[2]","a*G*(1-x[2]*x[2])*H*x[2]"),G=G, a=alpha, H=H_uni, degree=q_degree)
 
 '''
 Set up variational form of Fokker-Planck equation for initial value problem (IVP)
