@@ -16,12 +16,12 @@ parameters["mesh_partitioner"] = "ParMETIS"
 '''
 Plot control
 '''
-outputStats=False
+outputStats = False
 
 '''
 FANTASI simulation name
 '''
-simName = "relaxation_5"
+simName = "large_field_02"
 
 '''
 Mesh
@@ -29,7 +29,7 @@ Mesh
 global_normal = Expression(("x[0]", "x[1]", "x[2]"), degree=3)
 meshid = "sphere_ico6"
 meshfile = "meshes/%s.xml.gz" % meshid
-mesh=Mesh(meshfile)
+mesh = Mesh(meshfile)
 mesh.init_cell_orientations(global_normal)
 OutLine = "Mesh dimensions: %d" % mesh.topology().dim()
 print(OutLine)
@@ -37,14 +37,14 @@ print(OutLine)
 '''
 Control parameters for FEM solver
 '''
-q_degree = 3
-absTol=1e-15
-relTol=1e-5
+q_degree = 2
+absTol = 1e-15
+relTol = 1e-5
 
 '''
 Control parameters for time stepping and time integration
 '''
-tscale=1e-9                      # Scale factor to convert simulation time to real-time
+tscale = 1e-9                    # Scale factor to convert simulation time to real-time
 num_steps = 31                   # total number of steps
 dt = 1e-18 / tscale              # time step size (in simulation time)
 startDt = 1e-4                   # First time step to try (time-scaled)
@@ -64,11 +64,11 @@ gamFac = 1.7595e11             # in rad/(s.T)
 Free layer description
 '''
 alpha = 0.0135                                   # Unitless damping factor
-Ms =450e3                                        # in A/m
-t_FL=1.0e-9                                      # thickness of FL
-diameter=40.0e-9                                 # diameter of FL with circular cross-section
+Ms = 450e3                                       # in A/m
+t_FL = 1.0e-9                                    # thickness of FL
+diameter = 40.0e-9                               # diameter of FL with circular cross-section
 magVolume = t_FL * (diameter**2) * (np.pi/4.0)   # in m^3
-G=Constant((gamFac*tscale*mu0)/(1+alpha**2))     # Scale factor for LLG equation (time-scaled)
+G = Constant((gamFac*tscale*mu0)/(1+alpha**2))   # Scale factor for LLG equation (time-scaled)
 
 '''
 Temperature parameters
@@ -79,42 +79,45 @@ D = Constant(alpha * gamFac * tscale * kBoltzmann * Temperature / ((1+alpha**2)*
 '''
 Definitions for uniaxial anisotropy
 '''
-delta=44.0
-Eb=delta*kBoltzmann*Temperature
-Ku2=Eb/magVolume
-H_uni=Constant((2*Ku2)/(mu0*Ms))
+delta = 44.0
+Eb = delta*kBoltzmann*Temperature
+Ku2 = Eb/magVolume
+H_uni = Constant((2*Ku2)/(mu0*Ms))
+
+'''
+Parameters for the large field being applied
+'''
+Happ_z = Constant(5*H_uni)
 
 '''
 The LLG equation
 '''
-dmdt=dmdt_huay(gam_fac=G, alph_damp=alpha, Huay=H_uni, q_degree=1)
+dmdt_field = dmdt_happz(gam_fac=G, alph_damp=alpha, Hz=Happ_z, q_degree=q_degree)
+dmdt = dmdt_huaz(gam_fac=G, alph_damp=alpha, Huaz=H_uni, q_degree=q_degree)
 
 '''
 Set up variational form of Fokker-Planck equation for initial value problem (IVP)
 '''
 
 #### Basis space
-V=FunctionSpace(mesh,'CG',q_degree)
-V_vec=VectorFunctionSpace(mesh,'CG',degree=q_degree,dim=3)
-
-#### Create time series file to import nodal values
-timeseries_rho = TimeSeries('rho_series')
+V = FunctionSpace(mesh,'CG',q_degree)
+V_vec = VectorFunctionSpace(mesh,'CG',degree=q_degree,dim=3)
 
 #### Define initial value on the mesh
-rho_curr=Function(V)
-timeseries_rho.retrieve(rho_curr.vector(),0.0)
+rho_D = Expression('1/(4*pi)', degree = 1)
+rho_curr = interpolate(rho_D,V)
 
 #### Set up LLG equation to be solved
-velocity_n=interpolate(dmdt,V_vec)
-velocity_p=velocity_n
+velocity_0 = interpolate(dmdt,V_vec)
+velocity_1 = interpolate(dmdt_field,V_vec)
 
 #### Set up variational form
-rho_=TrialFunction(V)
-v0=TestFunction(V)
-fpe_rhs  = dot(velocity_n*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
+rho_ = TrialFunction(V)
+v0 = TestFunction(V)
+fpe_rhs = dot((velocity_0+velocity_1)*rho_, grad(v0))*dx - D*dot(grad(rho_),grad(v0))*dx
 
 #### Create VTK file for saving solution and save initial value
-outDirName=simName+"_results"
+outDirName = simName+"_results"
 vtkfile = File(outDirName+"/solution.pvd")
 print('VTK File saved')
 vtkfile << (rho_curr, 0)
@@ -155,8 +158,8 @@ for idx1 in range(0, stageCount):
 
         obj.solve()
 
-        rho_curr=obj.u
-        t=obj.t
+        rho_curr = obj.u
+        t = obj.t
         print('VTK File saved')
         vtkfile << (rho_curr, (t*(1+idx) + idx1*T[1]))
         print('Updated probability:')
@@ -168,4 +171,5 @@ for idx1 in range(0, stageCount):
 
     T[1] = 10 * T[1]
 
+#### Save final solution in HDF5 file for easy import by other codes
 timeseries_rho.store(rho_curr.vector(), 0.0)
