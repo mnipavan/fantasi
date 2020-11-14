@@ -78,14 +78,14 @@ def dmdt_mp(gam_fac, alph_damp, Pfix, Pfree, LambFix, LambFree, epsPrime, Icurr,
 
 	lambdafreePlus = 1.0
 	lambdafreeMinus = 0.0
+	lambdafreePlus = np.sqrt(lambFree2 + 1.0)
 	if (lambFree2 > 1.0):
-		lambdafreePlus = np.sqrt(lambFree2 + 1.0)
 		lambdafreeMinus = np.sqrt(lambFree2 - 1.0)
 
 	lambdafixPlus = 1.0
 	lambdafixMinus = 0.0
+	lambdafixPlus = np.sqrt(lambFix2 + 1.0)
 	if (lambFix2 > 1.0):
-		lambdafixPlus = np.sqrt(lambFix2 + 1.0)
 		lambdafixMinus = np.sqrt(lambFix2 - 1.0)
 
 
@@ -138,6 +138,6 @@ def dmdt_mp(gam_fac, alph_damp, Pfix, Pfree, LambFix, LambFree, epsPrime, Icurr,
 	# gilb = gilbF * Icurr
 	gilbF=Constant((gam_fac / (1.0 + alph_damp*alph_damp)) * (HBAR / ( 2.0 * vol * Ms_ * QE * MU0 * pnorm)))
 	
-	dmdt=Expression(("(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (py*x[2] - pz*x[1]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[1]*(px*x[1] - py*x[0]) - x[2]*(x[0]*pz - x[2]*px))", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (x[0]*pz - x[2]*px) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[2]*(py*x[2] - pz*x[1]) - x[0]*(px*x[1] - py*x[0]))", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (px*x[1] - py*x[0]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) - (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[0]*(x[0]*pz - x[2]*px) - x[1]*(py*x[2] - pz*x[1]))"), gilb=gilbF, Icurr=Icurr, alpha=alph_damp, B=epsPrime, q_minus=q_minus, q_plus=q_plus, lplus2=lplus2, lminus2=lminus2, px=mp[0], py=mp[1], pz=mp[2], degree=q_degree)
+	dmdt=Expression(("(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (py*x[2] - pz*x[1]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[1]*(px*x[1] - py*x[0]) - x[2]*(x[0]*pz - x[2]*px))", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (x[0]*pz - x[2]*px) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[2]*(py*x[2] - pz*x[1]) - x[0]*(px*x[1] - py*x[0]))", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (px*x[1] - py*x[0]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[0]*(x[0]*pz - x[2]*px) - x[1]*(py*x[2] - pz*x[1]))"), gilb=gilbF, Icurr=Icurr, alpha=alph_damp, B=epsPrime, q_minus=q_minus, q_plus=q_plus, lplus2=lplus2, lminus2=lminus2, px=mp[0], py=mp[1], pz=mp[2], degree=q_degree)
 	return dmdt
 
