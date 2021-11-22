@@ -1,0 +1,1 @@
+The codes in this directory are the main codes used for the publication 'A Fokker-Planck Approach for Modeling the Stochastic Phenomena in Magnetic and Resistive Random Access Memory Devices' (doi: 10.1109/TED.2021.3123067).
