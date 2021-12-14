@@ -7,7 +7,7 @@
 
 OUTDATE=`date`
 echo "Started at $OUTDATE"
-export SIMDIR=~/proj/fpe/spintronic_fpe
+export SIMDIR=~/proj/fpe/fantasi/spintronic
 export FNAME=relaxation_04
 export SCRIPT=${FNAME}.py
 #export MPICOMMAND="mpirun -np 8 "
