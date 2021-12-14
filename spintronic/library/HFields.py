@@ -8,15 +8,15 @@ The LLG equation for Zeeman fields defined by (Hx, Hy and Hz)
 The functions expect gam_fac to be "gamma / (1+alpha*alpha)"
 '''
 def dmdt_happx(gam_fac, alph_damp, Hx, q_degree):
-	dmdt=Expression(("G*a*(1-x[0]*x[0])*H","-1.0*G*(x[2]+a*x[0]*x[1])*H","G*(x[1]-a*x[0]*x[2])*H"),G=gam_fac, a=alph_damp, H=Hx, degree=q_degree)
+	dmdt=Expression(("G*a*(1-x[0]*x[0])*H/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","-1.0*G*(x[2]+a*x[0]*x[1])*H/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","G*(x[1]-a*x[0]*x[2])*H/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])"),G=gam_fac, a=alph_damp, H=Hx, degree=q_degree)
 	return dmdt
 
 def dmdt_happy(gam_fac, alph_damp, Hy, q_degree):
-	dmdt=Expression(("G*(x[2]-a*x[0]*x[1])*H","G*a*(1-x[1]*x[1])*H","-1.0*G*(x[0]+a*x[1]*x[2])*H"),G=gam_fac, a=alph_damp, H=Hy, degree=q_degree)
+	dmdt=Expression(("G*(x[2]-a*x[0]*x[1])*H/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","G*a*(1-x[1]*x[1])*H/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","-1.0*G*(x[0]+a*x[1]*x[2])*H/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])"),G=gam_fac, a=alph_damp, H=Hy, degree=q_degree)
 	return dmdt
 
 def dmdt_happz(gam_fac, alph_damp, Hz, q_degree):
-	dmdt=Expression(("-1.0*G*(x[1]+a*x[0]*x[2])*H","G*(x[0]-a*x[1]*x[2])*H","G*a*(1-x[2]*x[2])*H"),G=gam_fac, a=alph_damp, H=Hz, degree=q_degree)
+	dmdt=Expression(("-1.0*G*(x[1]+a*x[0]*x[2])*H/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","G*(x[0]-a*x[1]*x[2])*H/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","G*a*(1-x[2]*x[2])*H/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])"),G=gam_fac, a=alph_damp, H=Hz, degree=q_degree)
 	return dmdt
 
 '''
@@ -27,15 +27,15 @@ These functions can be combined to calculate the shape anisotropy
 effective field
 '''
 def dmdt_huax(gam_fac, alph_damp, Huax, q_degree):
-	dmdt=Expression(("G*a*(1-x[0]*x[0])*H*x[0]","-1.0*G*(x[2]+a*x[0]*x[1])*H*x[0]","G*(x[1]-a*x[0]*x[2])*H*x[0]"),G=gam_fac, a=alph_damp, H=Huax, degree=q_degree)
+	dmdt=Expression(("G*a*(1-x[0]*x[0])*H*x[0]/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","-1.0*G*(x[2]+a*x[0]*x[1])*H*x[0]/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","G*(x[1]-a*x[0]*x[2])*H*x[0]/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])"),G=gam_fac, a=alph_damp, H=Huax, degree=q_degree)
 	return dmdt
 
 def dmdt_huay(gam_fac, alph_damp, Huay, q_degree):
-	dmdt=Expression(("G*(x[2]-a*x[0]*x[1])*H*x[1]","G*a*(1-x[1]*x[1])*H*x[1]","-1.0*G*(x[0]+a*x[1]*x[2])*H*x[1]"),G=gam_fac, a=alph_damp, H=Huay, degree=q_degree)
+	dmdt=Expression(("G*(x[2]-a*x[0]*x[1])*H*x[1]/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","G*a*(1-x[1]*x[1])*H*x[1]/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","-1.0*G*(x[0]+a*x[1]*x[2])*H*x[1]/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])"),G=gam_fac, a=alph_damp, H=Huay, degree=q_degree)
 	return dmdt
 
 def dmdt_huaz(gam_fac, alph_damp, Huaz, q_degree):
-	dmdt=Expression(("-1.0*G*(x[1]+a*x[0]*x[2])*H*x[2]","G*(x[0]-a*x[1]*x[2])*H*x[2]","G*a*(1-x[2]*x[2])*H*x[2]"),G=gam_fac, a=alph_damp, H=Huaz, degree=q_degree)
+	dmdt=Expression(("-1.0*G*(x[1]+a*x[0]*x[2])*H*x[2]/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","G*(x[0]-a*x[1]*x[2])*H*x[2]/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])","G*a*(1-x[2]*x[2])*H*x[2]/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])"),G=gam_fac, a=alph_damp, H=Huaz, degree=q_degree)
 	return dmdt
 
 '''
@@ -138,6 +138,5 @@ def dmdt_mp(gam_fac, alph_damp, Pfix, Pfree, LambFix, LambFree, epsPrime, Icurr,
 	# gilb = gilbF * Icurr
 	gilbF=Constant((gam_fac / (1.0 + alph_damp*alph_damp)) * (HBAR / ( 2.0 * vol * Ms_ * QE * MU0 * pnorm)))
 	
-	dmdt=Expression(("(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (py*x[2] - pz*x[1]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[1]*(px*x[1] - py*x[0]) - x[2]*(x[0]*pz - x[2]*px))", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (x[0]*pz - x[2]*px) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[2]*(py*x[2] - pz*x[1]) - x[0]*(px*x[1] - py*x[0]))", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (px*x[1] - py*x[0]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[0]*(x[0]*pz - x[2]*px) - x[1]*(py*x[2] - pz*x[1]))"), gilb=gilbF, Icurr=Icurr, alpha=alph_damp, B=epsPrime, q_minus=q_minus, q_plus=q_plus, lplus2=lplus2, lminus2=lminus2, px=mp[0], py=mp[1], pz=mp[2], degree=q_degree)
+	dmdt=Expression(("(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (py*x[2] - pz*x[1]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[1]*(px*x[1] - py*x[0]) - x[2]*(x[0]*pz - x[2]*px))/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (x[0]*pz - x[2]*px) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[2]*(py*x[2] - pz*x[1]) - x[0]*(px*x[1] - py*x[0]))/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])", "(gilb * Icurr * (B - alpha * ((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))))) * (px*x[1] - py*x[0]) + (gilb * Icurr * (((q_plus / (lplus2 + (lminus2 * (px*x[0] + py*x[1] + pz*x[2])))) + (q_minus / (lplus2 - (lminus2 * (px*x[0] + py*x[1] + pz*x[2]))))) + alpha * B)) * (x[0]*(x[0]*pz - x[2]*px) - x[1]*(py*x[2] - pz*x[1]))/sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])"), gilb=gilbF, Icurr=Icurr, alpha=alph_damp, B=epsPrime, q_minus=q_minus, q_plus=q_plus, lplus2=lplus2, lminus2=lminus2, px=mp[0], py=mp[1], pz=mp[2], degree=q_degree)
 	return dmdt
-
